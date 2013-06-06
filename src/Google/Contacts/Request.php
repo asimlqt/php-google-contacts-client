@@ -52,10 +52,7 @@ class Request
      * 
      * @var array
      */
-    private $query = array(
-        'alt' => 'json',
-        'max-results' => 1000000,
-    );
+    private $query = array();
 
     /**
      * Post body. Only used for POST and PUT requests
@@ -164,9 +161,30 @@ class Request
         return $this;
     }
     
+    /**
+     * Get additional query parameters
+     * 
+     * @return array
+     */
     public function getQueryParams()
     {
         return $this->query;
+    }
+
+    /**
+     * Set additional query parameters
+     * 
+     * @return array
+     */
+    public function setQueryParams($params)
+    {
+        $this->query = $params;
+        return $this;
+    }
+
+    public function addQueryParam($key, $value)
+    {
+        $this->query[$key] = $value;
     }
 
     /**
@@ -192,6 +210,11 @@ class Request
         return $this;
     }
     
+    /**
+     * Get headers 
+     * 
+     * @return array
+     */
     public function getHeaders()
     {
         return $this->headers;

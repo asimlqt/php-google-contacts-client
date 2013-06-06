@@ -35,23 +35,75 @@ class Service
     {
         $serviceRequest = ServiceRequestFactory::getInstance();
         $serviceRequest->getRequest()->setEndpoint("{$userEmail}/full");
+        $serviceRequest->getRequest()->addQueryParam('max-results', 1000000);
+        $serviceRequest->getRequest()->addQueryParam('alt', 'json');
         $res = $serviceRequest->execute();
         return new ListFeed(json_decode($res, true));
     }
 
+    public function createContact($userEmail, $data)
+    {
+
+        $entry = "
+            <atom:entry xmlns:atom='http://www.w3.org/2005/Atom'
+                xmlns:gd='http://schemas.google.com/g/2005'>
+              <gd:name>
+                 <gd:givenName>{firstname}</gd:givenName>
+                 <gd:familyName>{lastname}</gd:familyName>
+                 <gd:fullName>{fullname}</gd:fullName>
+              </gd:name>
+              <gd:email rel='http://schemas.google.com/g/2005#work'
+                primary='true'
+                address='{email}' displayName='{fullname}'/>
+            </atom:entry>
+        ";
+        
+        $entry = str_replace("\n", '', $entry);
+        $entry = preg_replace('/\s{2,}/', ' ', $entry);
+        
+        if(!isset($data['firstname']) || !isset($data['lastname'])) {
+            throw new Exception('Must supply contact firstname and lastname');
+        }
+        
+        $name = $data['firstname'] . ' ' . $data['lastname'];
+        $entry = str_replace('{firstname}', $data['firstname'], $entry);
+        $entry = str_replace('{lastname}', $data['lastname'], $entry);
+        $entry = str_replace('{fullname}', $name, $entry);
+        $entry = str_replace('{email}', $data['email'], $entry);
+
+        //echo $entry;exit;
+        
+        $serviceRequest = ServiceRequestFactory::getInstance();
+        $request = $serviceRequest->getRequest(); /* @var $request \Google\Contacts\Request */
+        $request->setEndpoint("{$userEmail}/full");
+        $request->setPost($entry);
+        $request->setMethod('POST');
+        $request->setHeaders(array('Content-Type' => 'application/atom+xml; charset=UTF-8; type=feed'));
+        //$request->removeQueryParams();
+        $res = $serviceRequest->execute();
+        var_dump($res);
+    }
+
+
     /**
-     * Fetches a single Contacts from google drive by id if you decide 
-     * to store the id locally. This can help reduce api calls.
+     * Fetches a single Contact
      * 
-     * @param  string $id the id of the Contacts
+     * @param string $contactId contact id
      * 
      * @return \Google\Contacts\Contacts
+     *
+     * @throws \Google\Contacts\Exception if contact not found
      */
-    /*
-    public function getContactsById($id)
+    public function getContact($contactId)
     {
-        $this->request->setEndpoint('feeds/Contactss/private/full/'. $id);
-        $res = $this->execute();
-        return new Contacts($res);
-    }*/
+        // The request will fail with the standard contact id url
+        $contactId = str_replace('http://', 'https://', $contactId);
+        $contactId = str_replace('/base/', '/full/', $contactId);
+        
+        $serviceRequest = ServiceRequestFactory::getInstance();
+        $serviceRequest->getRequest()->setFullUrl($contactId);
+        $res = json_decode($serviceRequest->execute(), true);
+        return new Entry($res['entry']);
+    }
+
 }

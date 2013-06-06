@@ -45,6 +45,7 @@ class Autoloader
         'Google\\Contacts\\Entry\\Name' => 'Google/Contacts/Entry/Name',
         'Google\\Contacts\\Entry\\Email' => 'Google/Contacts/Entry/Email',
         'Google\\Contacts\\Entry\\PhoneNumber' => 'Google/Contacts/Entry/PhoneNumber',
+        'Google\\Contacts\\EntryXml' => 'Google/Contacts/EntryXml',
         'Google\\Contacts\\ListFeed' => 'Google/Contacts/ListFeed',
     );
 

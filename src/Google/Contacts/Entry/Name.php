@@ -50,7 +50,7 @@ class Name
     /**
      * Constructor
      */
-    public function __construct($element)
+    public function __construct($element=array())
     {
         foreach($element as $key => $val) {
             $name = substr($key, 3);
@@ -68,6 +68,12 @@ class Name
         return $this->givenName;
     }
 
+    public function setGivenName($name)
+    {
+        $this->givenName = $name;
+        return $this;
+    }
+
     /**
      * Get the contacts family name
      * 
@@ -78,6 +84,12 @@ class Name
         return $this->familyName;
     }
 
+    public function setFamilyName($name)
+    {
+        $this->familyName = $name;
+        return $this;
+    }
+
     /**
      * Get the contacts full name
      * 
@@ -86,6 +98,12 @@ class Name
     public function getFullName()
     {
         return $this->fullName;
+    }
+
+    public function setFullName($name)
+    {
+        $this->fullName = $name;
+        return $this;
     }
     
 }

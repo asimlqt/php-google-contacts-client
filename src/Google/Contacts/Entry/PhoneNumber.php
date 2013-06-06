@@ -60,6 +60,16 @@ class PhoneNumber
     }
 
     /**
+     * Set the phone number type
+     * 
+     * @param string $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
      * Get phone number
      * 
      * @return string
@@ -67,6 +77,11 @@ class PhoneNumber
     public function getPhoneNumber()
     {
         return $this->phoneNumber;
+    }
+
+    public function setPhoneNumber($phoneNumber)
+    {
+        $this->phoneNumber = $phoneNumber;
     }
     
 }
