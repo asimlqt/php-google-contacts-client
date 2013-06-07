@@ -41,12 +41,20 @@ class PhoneNumber
     private $phoneNumber = '';
 
     /**
+     * Whether this is the contacts primary phone number or not
+     * 
+     * @var boolean
+     */
+    private $primary;
+
+    /**
      * Constructor
      */
-    public function __construct($type, $phoneNumber)
+    public function __construct($type, $phoneNumber, $primary=false)
     {
         $this->type = $type;
         $this->phoneNumber = $phoneNumber;
+        $this->primary = $primary;
     }
 
     /**
@@ -79,9 +87,34 @@ class PhoneNumber
         return $this->phoneNumber;
     }
 
+    /**
+     * Set the phone number
+     * 
+     * @param string $phoneNumber
+     */
     public function setPhoneNumber($phoneNumber)
     {
         $this->phoneNumber = $phoneNumber;
     }
     
+    /**
+     * Returns true if this is the contacts primary phone number and
+     * false if not.
+     * 
+     * @return boolean
+     */
+    public function getPrimary()
+    {
+        return $this->primary;
+    }
+
+    /**
+     * Set whether this phone number is the primary number or not.
+     * 
+     * @param boolean $bool
+     */
+    public function setPrimary($bool)
+    {
+        $this->primary = $bool;
+    }
 }

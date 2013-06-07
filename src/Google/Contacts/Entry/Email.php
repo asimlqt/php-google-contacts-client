@@ -68,6 +68,16 @@ class Email
     }
 
     /**
+     * Set the email type
+     * 
+     * @param string $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
      * Get email address
      * 
      * @return string
@@ -78,6 +88,16 @@ class Email
     }
     
     /**
+     * Set the email address
+     * 
+     * @param string $address
+     */
+    public function setAddress($address)
+    {
+        $this->address = $address;
+    }
+
+    /**
      * Returns true if this is the contacts primary email address and
      * false if not.
      * 
@@ -86,6 +106,16 @@ class Email
     public function isPrimary()
     {
         return $this->primary;
+    }
+
+    /**
+     * Set whether this email address is the primary address or not.
+     * 
+     * @param boolean $bool
+     */
+    public function setPrimary($bool)
+    {
+        $this->primary = $bool;
     }
     
 }

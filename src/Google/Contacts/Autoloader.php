@@ -47,6 +47,7 @@ class Autoloader
         'Google\\Contacts\\Entry\\PhoneNumber' => 'Google/Contacts/Entry/PhoneNumber',
         'Google\\Contacts\\EntryXml' => 'Google/Contacts/EntryXml',
         'Google\\Contacts\\ListFeed' => 'Google/Contacts/ListFeed',
+        'Google\\Contacts\\Constants' => 'Google/Contacts/Constants',
     );
 
     public function autoload($cls)

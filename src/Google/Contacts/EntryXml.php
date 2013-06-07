@@ -62,6 +62,21 @@ class EntryXml
         $xml->writeElement('gd:fullName', $entry->getName()->getFullName());
         $xml->endElement(); // gd:name element
 
+        // phone numbers
+        if(count($entry->getPhoneNumbers()) > 0) {
+            foreach($entry->getPhoneNumbers() as $phone) {
+                $xml->startElement('gd:phoneNumber');
+                $xml->writeAttribute('rel', $phone->getType());
+
+                if($phone->getPrimary() === true) {
+                    $xml->writeAttribute('primary', $phone->getPrimary());
+                }
+
+                $xml->text($phone->getPhoneNumber());
+                $xml->endElement();
+            }
+        }
+
         $xml->endElement();
 
         return $xml->outputMemory();

@@ -176,6 +176,8 @@ class Entry
     {
         $xml = new EntryXml();
         $post = $xml->getXml($this);
+        var_dump($post);
+        exit;
 
         $serviceRequest = ServiceRequestFactory::getInstance();
         $request = $serviceRequest->getRequest(); /* @var $request \Google\Contacts\Request */
