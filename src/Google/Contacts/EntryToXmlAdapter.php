@@ -29,8 +29,9 @@ class EntryToXmlAdapter
     /**
      * Convert an Entry object into an xml string which can be 
      * posted 
+     * 
      * @param  Entry  $entry [description]
-     * @return [type]        [description]
+     * @return string
      */
     public function adapt(Entry $entry)
     {
@@ -57,11 +58,13 @@ class EntryToXmlAdapter
             }
         }
 
-        $xml->startElement('gd:name');
-        $xml->writeElement('gd:givenName', $entry->getName()->getGivenName());
-        $xml->writeElement('gd:familyName', $entry->getName()->getFamilyName());
-        $xml->writeElement('gd:fullName', $entry->getName()->getFullName());
-        $xml->endElement(); // gd:name element
+        if(!is_null($entry->getName())) {
+            $xml->startElement('gd:name');
+            $xml->writeElement('gd:givenName', $entry->getName()->getGivenName());
+            $xml->writeElement('gd:familyName', $entry->getName()->getFamilyName());
+            $xml->writeElement('gd:fullName', $entry->getName()->getFullName());
+            $xml->endElement(); // gd:name element
+        }
 
         // phone numbers
         if(count($entry->getPhoneNumbers()) > 0) {

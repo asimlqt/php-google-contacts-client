@@ -43,9 +43,28 @@ class Service
     }
 
     /**
-     * Fetches a single Contact
+     * Search contacts
      * 
-     * @param string $contactId contact id
+     * @param  [type] $query [description]
+     * @return [type]        [description]
+     */
+    public function search($query)
+    {
+        $serviceRequest = ServiceRequestFactory::getInstance();
+        $serviceRequest->getRequest()->setEndpoint("default/full");
+        $serviceRequest->getRequest()->addQueryParam('max-results', 1000000);
+        $serviceRequest->getRequest()->addQueryParam('alt', 'json');
+        $serviceRequest->getRequest()->addQueryParam('q', $query);
+        $res = $serviceRequest->execute();
+        return new ListFeed(json_decode($res, true));   
+    }
+
+    /**
+     * Fetches a single Contact. The contact id can either be a complete
+     * url for the contact e.g. the id of the contact entry or it can
+     * simply be the actual id string.
+     * 
+     * @param string $contactId contact id on its own or a coplete url
      * 
      * @return \Google\Contacts\Contacts
      *
@@ -55,11 +74,16 @@ class Service
     {
         $serviceRequest = ServiceRequestFactory::getInstance();
         $serviceRequest->getRequest()->addQueryParam('alt', 'json');
-        $serviceRequest->getRequest()->setEndpoint("default/full/{$contactId}");
-        //$serviceRequest->getRequest()->setFullUrl($contactId);
+        if(substr($contactId, 0, 4) === 'http') {
+            $serviceRequest->getRequest()->setFullUrl($contactId);
+        } else {
+            $serviceRequest->getRequest()->setEndpoint("default/full/{$contactId}");
+        }
         $res = json_decode($serviceRequest->execute(), true);
-        //var_dump($res);exit;
-        return new Entry($res['entry']);
+        if(isset($res['entry']))
+            return new Entry($res['entry']);
+        else
+            throw new Exception('Contact not found');
     }
 
 }
