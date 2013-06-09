@@ -16,7 +16,7 @@ $accessToken = 'ya29.AHES6ZSe_cWRY4GHXI2PTAn5cIi_l_mVYniFzbTpYyaPux1RgPw';
 Google\Contacts\ServiceRequestFactory::setInstance(new Google\Contacts\DefaultServiceRequest(new Google\Contacts\Request($accessToken)));
 
 $service = new Google\Contacts\Service();
-$contacts = $service->getAll('asimlqt22@gmail.com')->getEntries();
+$contacts = $service->getAll()->getEntries();
 
 foreach($contacts as $entry) {
     if(!is_null($entry->getName()))
