@@ -3,7 +3,7 @@ php-google-contacts-client
 
 PHP client library for accessing Google Contacts
 
-**Warning: Do not use update contacts using the Entry::save() method if you have groups or photos setup for your contacts.They have not yet been implemented and you will lose that data**
+**Warning: Do not update contacts using the Entry::save() method if you have groups or photos setup for your contacts.  They have not yet been implemented and you will lose that data**
 
 Example Usage:
 
