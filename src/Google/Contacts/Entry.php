@@ -26,14 +26,65 @@ namespace Google\Contacts;
  */
 class Entry
 {
+    /**
+     * Etag
+     * @var string
+     */
     private $etag;
+
+    /**
+     * $id
+     * @var string
+     */
     private $id;
+
+    /**
+     * $updated
+     * @var DateTime
+     */
     private $updated;
-    private $editUrl;
+
+    /**
+     * $links
+     * @var array
+     */
+    private $links = array();
+
+    /**
+     * $title
+     * @var string
+     */
     private $title;
+
+    /**
+     * $name
+     * @var string
+     */
     private $name;
+
+    /**
+     * $phoneNumbers
+     * @var array
+     */
     private $phoneNumbers = array();
+
+    /**
+     * $emails
+     * @var array
+     */
     private $emails = array();
+
+    /**
+     * $postalAddresses
+     * @var array
+     */
+    private $postalAddresses = array();
+
+    /**
+     * $birthday
+     * @var DateTime
+     */
+    private $birthday;
 
     /**
      * The xml entry for a single contact
@@ -42,14 +93,32 @@ class Entry
      */
     private $entry;
 
+    /**
+     * Constructor
+     * @param array $entry 
+     */
     public function __construct($entry=null)
     {
         if(!is_null($entry)) {
+            //var_dump($entry);exit;
+            //return;
             $this->etag = $entry['gd$etag'];
             $this->id = $entry['id']['$t'];
-            $this->$updated = new \DateTime($entry['updated']['$t']);
-            $this->editUrl = Util::getLinkHref($entry, 'edit');
+            $this->updated = new \DateTime($entry['updated']['$t']);
+
             $this->title = $entry['title']['$t'];
+
+            foreach($entry['link'] as $link) {
+                $l = new Entry\Link();
+                $l->setRel($link['rel'])
+                    ->setType($link['type'])
+                    ->setHref($link['href']);
+                $this->links[] = $l;
+            }
+
+            if(isset($entry['gContact$birthday'])) {
+                $this->birthday = new \DateTime($entry['gContact$birthday']['when']);
+            }
 
             if(isset($entry['gd$name'])) {
                $this->name = new Entry\Name($entry['gd$name']);
@@ -57,23 +126,45 @@ class Entry
 
             if(isset($entry['gd$phoneNumber'])) {
                 foreach($entry['gd$phoneNumber'] as $el) {
-                    $type = substr($el['rel'], strpos($el['rel'], '#')+1);
+                    //$type = substr($el['rel'], strpos($el['rel'], '#')+1);
                     $number = $el['$t'];
-                    $this->phones[] = new Entry\PhoneNumber($type, $number);
+                    $primary = (isset($el['primary']) && $el['primary'] === 'true') ? true : false;
+                    $this->phones[] = new Entry\PhoneNumber($el['rel'], $number, $primary);
                 }
             }
 
             if(isset($entry['gd$email'])) {
                 $el = $entry['gd$email'];
                 foreach($el as $email) {
-                    $type = substr($email['rel'], strpos($email['rel'], '#')+1);
+                    //$type = substr($email['rel'], strpos($email['rel'], '#')+1);
                     $address = $email['address'];
-                    $this->emails[] = new Entry\Email($type, $address, $email['primary'] === 'true');
+                    $primary = (isset($email['primary']) && $email['primary'] === 'true') ? true : false;
+                    $this->emails[] = new Entry\Email($email['rel'], $address, $primary);
+                }
+            }
+
+            if(isset($entry['gd$structuredPostalAddress'])) {
+                foreach($entry['gd$structuredPostalAddress'] as $spa) {
+                    $addr = new Entry\StructuredPostalAddress();
+                    $addr->setPrimary((isset($spa['primary']) && $spa['primary'] === 'true'))
+                        ->setRel($spa['rel'])
+                        ->setFormattedAddress($spa['gd$formattedAddress']['$t'])
+                        ->setStreet($spa['gd$street']['$t'])
+                        ->setPostcode($spa['gd$postcode']['$t'])
+                        ->setCity($spa['gd$city']['$t'])
+                        ->setRegion($spa['gd$region']['$t'])
+                        ->setCountry($spa['gd$country']['$t']);
+                    $this->postalAddresses[] = $addr;
                 }
             }
         }
     }
 
+    /**
+     * Get the etag
+     * 
+     * @return string
+     */
     public function getEtag()
     {
         return $this->etag;
@@ -119,9 +210,56 @@ class Entry
         return $this->title;
     }
 
+    /**
+     * Set the title
+     * 
+     * @param string $title
+     */
     public function setTitle($title)
     {
         $this->title = $title;
+    }
+
+    /**
+     * Get the date of birth
+     * 
+     * @return DateTime|null
+     */
+    public function getBirthday()
+    {
+        return $this->birthday;
+    }
+    
+    /**
+     * Set the date of birth
+     * 
+     * @param \DateTime $birthday
+     */
+    public function setBirthday(\DateTime $birthday)
+    {
+        $this->birthday = $birthday;
+        return $this;
+    }
+
+    /**
+     * Get links
+     * 
+     * @return array
+     */
+    public function getLinks()
+    {
+        return $this->links;
+    }
+
+    /**
+     * THIS IS PROBABLY NOT REQUIRED
+     * 
+     * @param [type] $links [description]
+     */
+    public function setLinks($links)
+    {
+        $this->links = $links;
+        return $this;
     }
 
     /**
@@ -134,6 +272,11 @@ class Entry
         return $this->name;
     }
 
+    /**
+     * Set the name components
+     * 
+     * @param Entry\Name $name
+     */
     public function setName(Entry\Name $name)
     {
         $this->name = $name;
@@ -150,6 +293,11 @@ class Entry
         return $this->phoneNumbers;
     }
 
+    /**
+     * Set phone numbers
+     * 
+     * @param array $phoneNumbers
+     */
     public function setPhoneNumbers(array $phoneNumbers)
     {
         $this->phoneNumbers = $phoneNumbers;
@@ -166,27 +314,73 @@ class Entry
         return $this->emails;
     }
 
+    /**
+     * Set emails
+     * 
+     * @param array $emails
+     *
+     * @return Entry
+     */
     public function setEmails(array $emails)
     {
         $this->emails = $emails;
         return $this;
     }
 
-    public function save($userEmail)
+    /**
+     * Get postal addresses
+     * 
+     * @return array
+     */
+    public function getPostalAddresses()
     {
-        $xml = new EntryXml();
-        $post = $xml->getXml($this);
-        var_dump($post);
-        exit;
+        return $this->postalAddresses;
+    }
+
+    /**
+     * Set postal addresses
+     * 
+     * @param array $addresses
+     */
+    public function setPostalAddresses(array $addresses)
+    {
+        $this->postalAddresses = $addresses;
+        return $this;
+    }
+
+    /**
+     * Save this contact
+     *
+     * If the id of this entry is not null then anpu update will be performed
+     * otherwise a new contact will be created
+     * 
+     * @return
+     */
+    public function save()
+    {
+        $adapter = new EntryToXmlAdapter();
+        $post = $adapter->adapt($this);
+        //var_dump($post);
+        //exit;
 
         $serviceRequest = ServiceRequestFactory::getInstance();
         $request = $serviceRequest->getRequest(); /* @var $request \Google\Contacts\Request */
-        $request->setEndpoint("{$userEmail}/full");
+        $headers = array(
+            'Content-Type' => 'application/atom+xml; charset=UTF-8; type=feed',
+        );
+
+        if(!is_null($this->id)) {
+            $request->setMethod('PUT');
+            $request->setFullUrl($this->id);
+            $headers['If-Match'] = $this->etag;
+        } else {
+            $request->setEndpoint("default/full");
+            $request->setMethod('POST');
+        }
+
         $request->setPost($post);
-        $request->setMethod('POST');
-        $request->setHeaders(array('Content-Type' => 'application/atom+xml; charset=UTF-8; type=feed'));
-        //$request->removeQueryParams();
+        $request->setHeaders($headers);
         $res = $serviceRequest->execute();
-        var_dump($res);
+        //var_dump($res);
     }
 }

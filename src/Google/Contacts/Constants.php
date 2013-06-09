@@ -20,4 +20,8 @@ class Constants
 {
     const REL_HOME = 'http://schemas.google.com/g/2005#home';
     const REL_WORK = 'http://schemas.google.com/g/2005#work';
+    const REL_PHOTO = 'http://schemas.google.com/contacts/2008/rel#photo';
+
+    const REL_SELF = 'self';
+    const REL_EDIT = 'edit';
 }

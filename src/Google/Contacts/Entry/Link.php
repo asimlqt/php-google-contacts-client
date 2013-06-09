@@ -24,7 +24,7 @@ namespace Google\Contacts\Entry;
  * @version    0.1
  * @author     Asim Liaquat <asimlqt22@gmail.com>
  */
-class Email
+class Link
 {
     /**
      * phone number type.
@@ -38,23 +38,20 @@ class Email
      * 
      * @var string
      */
-    private $address = '';
+    private $rel = '';
 
     /**
      * Whether this is the contacts primary email address or not
      * 
-     * @var boolean
+     * @var string
      */
-    private $primary;
+    private $href;
 
     /**
      * Constructor
      */
-    public function __construct($type, $address, $primary=false)
+    public function __construct()
     {
-        $this->type = $type;
-        $this->address = $address;
-        $this->primary = $primary;
     }
 
     /**
@@ -75,6 +72,7 @@ class Email
     public function setType($type)
     {
         $this->type = $type;
+        return $this;
     }
 
     /**
@@ -82,9 +80,9 @@ class Email
      * 
      * @return string
      */
-    public function getAddress()
+    public function getRel()
     {
-        return $this->address;
+        return $this->rel;
     }
     
     /**
@@ -92,9 +90,10 @@ class Email
      * 
      * @param string $address
      */
-    public function setAddress($address)
+    public function setRel($rel)
     {
-        $this->address = $address;
+        $this->rel = $rel;
+        return $this;
     }
 
     /**
@@ -103,9 +102,9 @@ class Email
      * 
      * @return boolean
      */
-    public function getPrimary()
+    public function getHref()
     {
-        return $this->primary;
+        return $this->href;
     }
 
     /**
@@ -113,9 +112,10 @@ class Email
      * 
      * @param boolean $bool
      */
-    public function setPrimary($bool)
+    public function setHref($href)
     {
-        $this->primary = $bool;
+        $this->href = $href;
+        return $this;
     }
     
 }
