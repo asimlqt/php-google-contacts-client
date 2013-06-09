@@ -13,7 +13,8 @@ Example Usage:
 require_once 'src/Google/Contacts/Autoloader.php';
 
 $accessToken = 'ya29.AHES6ZSe_cWRY4GHXI2PTAn5cIi_l_mVYniFzbTpYyaPux1RgPw';
-Google\Contacts\ServiceRequestFactory::setInstance(new Google\Contacts\DefaultServiceRequest(new Google\Contacts\Request($accessToken)));
+$serviceRequest = new Google\Contacts\DefaultServiceRequest(new Google\Contacts\Request($accessToken));
+Google\Contacts\ServiceRequestFactory::setInstance($serviceRequest);
 
 $service = new Google\Contacts\Service();
 $contacts = $service->getAll()->getEntries();
