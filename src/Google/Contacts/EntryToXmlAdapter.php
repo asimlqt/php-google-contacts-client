@@ -40,9 +40,9 @@ class EntryToXmlAdapter
 
         $xml->startElementNS('atom', 'entry', 'http://www.w3.org/2005/Atom'); 
         $xml->writeAttribute('xmlns:gd', 'http://schemas.google.com/g/2005'); 
+        $xml->writeAttribute('xmlns:gContact', 'http://schemas.google.com/contact/2008');
 
         if(!is_null($entry->getId())) {
-            $xml->writeAttribute('xmlns:gContact', 'http://schemas.google.com/contact/2008');
             $xml->writeAttribute('gd:etag', $entry->getEtag()); 
             $xml->writeElement('id', $entry->getId());
             $xml->writeElement('updated', date('c', time()));
