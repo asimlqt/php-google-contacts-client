@@ -106,12 +106,18 @@ class EntryToXmlAdapter
                     $xml->writeAttribute('primary', 'true');
                 }
 
-                $xml->writeElement('gd:city', $addr->getCity());
-                $xml->writeElement('gd:street', $addr->getStreet());
-                $xml->writeElement('gd:region', $addr->getRegion());
-                $xml->writeElement('gd:postcode', $addr->getPostcode());
-                $xml->writeElement('gd:country', $addr->getCountry());
-                $xml->writeElement('gd:formattedAddress', $addr->getFormattedAddress());
+                if(!is_null($addr->getCity()))
+                    $xml->writeElement('gd:city', $addr->getCity());
+                if(!is_null($addr->getStreet()))
+                    $xml->writeElement('gd:street', $addr->getStreet());
+                if(!is_null($addr->getRegion()))
+                    $xml->writeElement('gd:region', $addr->getRegion());
+                if(!is_null($addr->getPostcode()))
+                    $xml->writeElement('gd:postcode', $addr->getPostcode());
+                if(!is_null($addr->getCountry()))
+                    $xml->writeElement('gd:country', $addr->getCountry());
+                if(!is_null($addr->getFormattedAddress()))
+                    $xml->writeElement('gd:formattedAddress', $addr->getFormattedAddress()); 
 
                 $xml->endElement();
             }
