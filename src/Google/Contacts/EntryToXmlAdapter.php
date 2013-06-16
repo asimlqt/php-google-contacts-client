@@ -129,6 +129,15 @@ class EntryToXmlAdapter
             $xml->endElement();
         }
 
+        if(count($entry->getCustomFields()) > 0) {
+            foreach($entry->getCustomFields() as $key => $value) {
+                $xml->startElement('gContact:userDefinedField');
+                $xml->writeAttribute('key', $key);
+                $xml->writeAttribute('value', $value);
+                $xml->endElement();
+            }
+        }
+
         $xml->endElement();
 
         return $xml->outputMemory();

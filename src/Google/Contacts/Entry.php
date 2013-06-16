@@ -87,6 +87,13 @@ class Entry
     private $birthday;
 
     /**
+     * Custom fields
+     * 
+     * @var array
+     */
+    private $customFields = array();
+
+    /**
      * The xml entry for a single contact
      * 
      * @var array
@@ -118,6 +125,14 @@ class Entry
 
             if(isset($entry['gContact$birthday'])) {
                 $this->birthday = new \DateTime($entry['gContact$birthday']['when']);
+            }
+
+            if(isset($entry['gContact$userDefinedField'])) {
+                $fields = $entry['gContact$userDefinedField'];
+                $this->customFields = new Entry\CustomFields();
+                foreach($fields as $field) {
+                    $this->customFields[$field['key']] = $field['value'];
+                }
             }
 
             if(isset($entry['gd$name'])) {
@@ -238,6 +253,27 @@ class Entry
     public function setBirthday(\DateTime $birthday)
     {
         $this->birthday = $birthday;
+        return $this;
+    }
+
+    /**
+     * Get custom fields
+     * 
+     * @return \Google\Contacts\Entry\CustomFields
+     */
+    public function getCustomFields()
+    {
+        return $this->customFields;
+    }
+    
+    /**
+     * [setCustomFields description]
+     * 
+     * @param \Google\Contacts\Entry\CustomFields $fields
+     */
+    public function setCustomFields(\Google\Contacts\Entry\CustomFields $customFields)
+    {
+        $this->customFields = $customFields;
         return $this;
     }
 
