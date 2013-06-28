@@ -41,9 +41,10 @@ class ListFeed
     {
         $entries = array();
 
-        if(count($this->feed['feed']['entry']) > 0)
-            foreach ($this->feed['feed']['entry'] as $entry)
-                $entries[] = new Entry($entry);
+        if(isset($this->feed['feed']['entry']))
+            if(count($this->feed['feed']['entry']) > 0)
+                foreach ($this->feed['feed']['entry'] as $entry)
+                    $entries[] = new Entry($entry);
 
         return $entries;
     }
