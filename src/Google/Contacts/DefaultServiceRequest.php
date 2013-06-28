@@ -74,7 +74,11 @@ class DefaultServiceRequest implements ServiceRequestInterface
 
         $ch = curl_init();
         curl_setopt_array($ch, $curlParams);
-        curl_setopt($ch, CURLOPT_URL, $this->request->getUrl() . '?' . http_build_query($this->request->getQueryParams()));
+
+        $url = $this->request->getUrl();
+        if(count($this->request->getQueryParams()) > 0)
+            $url .= '?' . http_build_query($this->request->getQueryParams());
+        curl_setopt($ch, CURLOPT_URL,  $url);
 
         if ($this->request->getMethod() === 'POST' || $this->request->getMethod() === 'PUT') {
             curl_setopt($ch, CURLOPT_POSTFIELDS, $this->request->getPost());
@@ -118,5 +122,6 @@ class DefaultServiceRequest implements ServiceRequestInterface
         $this->request->setFullUrl(null);
         $this->request->setEndpoint('');
         $this->request->setHeaders(array());
+        $this->request->setFeedType('contacts');
     }
 }

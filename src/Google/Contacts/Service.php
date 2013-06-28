@@ -34,7 +34,6 @@ class Service
     public function getAll()
     {
         $serviceRequest = ServiceRequestFactory::getInstance();
-        //$serviceRequest->getRequest()->setEndpoint("{$userEmail}/full");
         $serviceRequest->getRequest()->setEndpoint("default/full");
         $serviceRequest->getRequest()->addQueryParam('max-results', 1000000);
         $serviceRequest->getRequest()->addQueryParam('alt', 'json');
@@ -86,4 +85,33 @@ class Service
             throw new Exception('Contact not found');
     }
 
+    /**
+     * Fetches a list of spreadhsheet Contactss from google drive.
+     * 
+     * @return \Google\Contacts\ContactsFeed
+     */
+    public function getGroups()
+    {
+        $serviceRequest = ServiceRequestFactory::getInstance();
+        $serviceRequest->getRequest()->setEndpoint("default/full");
+        $serviceRequest->getRequest()->setFeedType('groups');
+        $serviceRequest->getRequest()->addQueryParam('max-results', 1000000);
+        $serviceRequest->getRequest()->addQueryParam('alt', 'json');
+        $res = $serviceRequest->execute();
+        return new GroupFeed(json_decode($res, true));
+    }
+
+    public function getGroup($groupId)
+    {
+        $serviceRequest = ServiceRequestFactory::getInstance();
+        $serviceRequest->getRequest()->setEndpoint("default/full/{$groupId}");
+        $serviceRequest->getRequest()->setFeedType('groups');
+        $serviceRequest->getRequest()->addQueryParam('alt', 'json');
+        $res = json_decode($serviceRequest->execute(), true);
+
+        if(isset($res['entry']))
+            return new GroupEntry($res['entry']);
+        else
+            throw new Exception('Group not found');
+    }
 }

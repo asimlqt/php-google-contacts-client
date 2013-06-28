@@ -45,7 +45,22 @@ class Request
      * 
      * @var string
      */
-    private $serviceUrl = 'https://www.google.com/m8/feeds/contacts/';
+    private $serviceUrl = 'https://www.google.com/m8/feeds/';
+
+    /**
+     * The type of feed, contacts or groups. Default is contacts.
+     * @var string
+     */
+    private $feedType = 'contacts';
+
+    /**
+     * Valid feed types.
+     * @var array
+     */
+    private $validFeedTypes = array(
+        'contacts',
+        'groups',
+    );
 
     /**
      * Query Parameters
@@ -119,7 +134,7 @@ class Request
         if(!is_null($this->fullUrl))
             $url = $this->fullUrl;
         else
-            $url = $this->serviceUrl . $this->endpoint;
+            $url = $this->serviceUrl . $this->feedType . '/' . $this->endpoint;
         return $url;
     }
 
@@ -160,7 +175,35 @@ class Request
         $this->endpoint = $endpoint;
         return $this;
     }
+
+    /**
+     * Get feed type.
+     * 
+     * @return string
+     */
+    public function getFeedType()
+    {
+        return $this->feedType;
+    }
     
+    /**
+     * Set feed type.
+     * 
+     * @param string $feedType
+     *
+     * @return  Google\Contacts\Request
+     *
+     * @throws Google\Contacts\Exception if incorrect feed type supplied
+     */
+    public function setFeedType($feedType)
+    {
+        if(!in_array($feedType, $this->validFeedTypes))
+            throw new Exception('Incorrect feed type');
+
+        $this->feedType = $feedType;
+        return $this;
+    }
+
     /**
      * Get additional query parameters
      * 
