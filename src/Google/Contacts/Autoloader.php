@@ -49,6 +49,7 @@ class Autoloader
         'Google\\Contacts\\Entry\\PhoneNumber' => 'Google/Contacts/Entry/PhoneNumber',
         'Google\\Contacts\\Entry\\StructuredPostalAddress' => 'Google/Contacts/Entry/StructuredPostalAddress',
         'Google\\Contacts\\Entry\\CustomFields' => 'Google/Contacts/Entry/CustomFields',
+        'Google\\Contacts\\Entry\\ExtendedProperty' => 'Google/Contacts/Entry/ExtendedProperty',
         'Google\\Contacts\\EntryToXmlAdapter' => 'Google/Contacts/EntryToXmlAdapter',
         'Google\\Contacts\\ListFeed' => 'Google/Contacts/ListFeed',
         'Google\\Contacts\\GroupFeed' => 'Google/Contacts/GroupFeed',

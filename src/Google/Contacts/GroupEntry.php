@@ -75,6 +75,12 @@ class GroupEntry
     private $systemGroup;
 
     /**
+     * Extended property
+     * @var array \Google\Contacts\Entry\ExtendedProperty
+     */
+    private $extendedProperty = array();
+
+    /**
      * The xml entry for a single contact
      * 
      * @var array
@@ -90,26 +96,56 @@ class GroupEntry
         if(!is_null($entry)) {
             //var_dump($entry);exit;
             //return;
-            $this->etag = $entry['gd$etag'];
-            $this->id = $entry['id']['$t'];
-            $this->updated = new \DateTime($entry['updated']['$t']);
-            $this->category = $entry['category'];
-            $this->title = $entry['title']['$t'];
-            $this->content = $entry['content']['$t'];
+            $this->expandEntry($entry);
+        }
+    }
 
-            if(isset($entry['gContact$systemGroup'])) {
-                $this->systemGroup = $entry['gContact$systemGroup'];
-            }
+    /**
+     * Extracts all the group information form the json response
+     * and sets all the class properties.
+     * 
+     * @param array $entry
+     * 
+     * @return null
+     */
+    private function expandEntry($entry)
+    {
+        $this->etag = $entry['gd$etag'];
+        $this->id = $entry['id']['$t'];
+        $this->updated = new \DateTime($entry['updated']['$t']);
+        $this->category = $entry['category'];
+        $this->title = $entry['title']['$t'];
+        $this->content = $entry['content']['$t'];
 
-            foreach($entry['link'] as $link) {
-                $l = new Entry\Link();
-                $l->setRel($link['rel'])
-                    ->setType($link['type'])
-                    ->setHref($link['href']);
-                $this->links[] = $l;
+        if(isset($entry['gContact$systemGroup'])) {
+            //$this->systemGroup = $entry['gContact$systemGroup'];
+            $this->systemGroup = true;
+        } else {
+            $this->systemGroup = false;
+        }
+
+        foreach($entry['link'] as $link) {
+            $l = new Entry\Link();
+            $l->setRel($link['rel'])
+                ->setType($link['type'])
+                ->setHref($link['href']);
+            $this->links[] = $l;
+        }
+
+        if(isset($entry['gd$extendedProperty'])) {
+            foreach($entry['gd$extendedProperty'] as $prop) {
+                $ep = new \Google\Contacts\Entry\ExtendedProperty();
+                $ep->setName($prop['name']);
+                $ep->setValue($prop['value']);
+                $this->extendedProperty[] = $ep;
             }
         }
     }
+
+    public function isSystemGroup()
+    {
+        return $this->systemGroup;
+    } 
 
     /**
      * Get the etag
@@ -122,7 +158,18 @@ class GroupEntry
     }
 
     /**
-     * Get the contact id
+     * Get the etag
+     * 
+     * @return string
+     */
+    public function setEtag($etag)
+    {
+        $this->etag = $etag;
+        return $this;
+    }
+
+    /**
+     * Get the group id
      * 
      * @return string
      */
@@ -130,6 +177,25 @@ class GroupEntry
     {
         return $this->id;
     }    
+
+    /**
+     * Set the group id
+     * 
+     * @return string
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+    public function getIdPart()
+    {
+        if(!is_string($this->id))
+            throw new Exception('id is not set');
+
+        return substr($this->id, strrpos($this->id, '/')+1);
+    }
 
     /**
      * Get the time contact was updated
@@ -203,6 +269,17 @@ class GroupEntry
         return $this;
     }
 
+    public function getExtendedProperty()
+    {
+        return $this->extendedProperty;
+    }
+    
+    public function setExtendedProperty($extendedProperty)
+    {
+        $this->extendedProperty = $extendedProperty;
+        return $this;
+    }
+
     /**
      * Save this contact
      *
@@ -213,8 +290,9 @@ class GroupEntry
      */
     public function save()
     {
-        $adapter = new EntryToXmlAdapter();
-        $post = $adapter->adapt($this);
+        //$adapter = new EntryToXmlAdapter();
+        //$post = $adapter->adapt($this);
+        $post = $this->toXml();
         //var_dump($post);
         //exit;
 
@@ -225,17 +303,61 @@ class GroupEntry
         );
 
         if(!is_null($this->id)) {
+            //var_dump($post);
             $request->setMethod('PUT');
-            $request->setFullUrl($this->id);
+            $request->setEndpoint("default/full/".$this->getIdPart());
             $headers['If-Match'] = $this->etag;
         } else {
             $request->setEndpoint("default/full");
             $request->setMethod('POST');
         }
 
+        $request->setFeedType('groups');
+        $request->addQueryParam('alt', 'json');
         $request->setPost($post);
         $request->setHeaders($headers);
-        $res = $serviceRequest->execute();
+        $res = json_decode($serviceRequest->execute(), true);
+        //var_dump(json_decode($res, true));exit;
+        $this->expandEntry($res['entry'], true);
         //var_dump($res);
+    }
+
+    public function toXml()
+    {
+        if(!is_array($this->extendedProperty) || count($this->extendedProperty) === 0) {
+            throw new Exception('extendedProperty not set');
+        }
+
+        $xml = new \XmlWriter();
+        $xml->openMemory();
+
+        $xml->startElementNS('atom', 'entry', 'http://www.w3.org/2005/Atom'); 
+        $xml->writeAttribute('xmlns:gd', 'http://schemas.google.com/g/2005'); 
+
+        if(!is_null($this->getId())) {
+            $xml->writeAttribute('gd:etag', $this->getEtag()); 
+            $xml->writeElement('id', $this->getId());
+            $xml->writeElement('updated', date('c', time()));
+        }
+
+        $xml->startElement('atom:category');
+        $xml->writeAttribute('scheme', 'http://schemas.google.com/g/2005#kind'); 
+        $xml->writeAttribute('term', 'http://schemas.google.com/contact/2008#group');
+        $xml->endElement();
+
+        $xml->startElement('atom:title');
+        $xml->writeAttribute('type', 'text');
+        $xml->text($this->title);
+        $xml->endElement();
+
+        foreach($this->extendedProperty as $ep) {
+            $xml->startElement('gd:extendedProperty');
+            $xml->writeAttribute('name', $ep->getName());
+            $xml->writeAttribute('value', $ep->getValue());
+            $xml->endElement();
+        }
+
+        $xml->endElement();
+        return $xml->outputMemory();
     }
 }
