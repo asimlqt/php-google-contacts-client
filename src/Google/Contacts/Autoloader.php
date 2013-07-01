@@ -41,7 +41,7 @@ class Autoloader
         'Google\\Contacts\\ServiceRequestFactory' => 'Google/Contacts/ServiceRequestFactory',
         'Google\\Contacts\\Util' => 'Google/Contacts/Util',
         'Google\\Contacts\\Service' => 'Google/Contacts/Service',
-        'Google\\Contacts\\Entry' => 'Google/Contacts/Entry',
+        'Google\\Contacts\\ContactEntry' => 'Google/Contacts/ContactEntry',
         'Google\\Contacts\\GroupEntry' => 'Google/Contacts/GroupEntry',
         'Google\\Contacts\\Entry\\Name' => 'Google/Contacts/Entry/Name',
         'Google\\Contacts\\Entry\\Link' => 'Google/Contacts/Entry/Link',
@@ -50,8 +50,7 @@ class Autoloader
         'Google\\Contacts\\Entry\\StructuredPostalAddress' => 'Google/Contacts/Entry/StructuredPostalAddress',
         'Google\\Contacts\\Entry\\CustomFields' => 'Google/Contacts/Entry/CustomFields',
         'Google\\Contacts\\Entry\\ExtendedProperty' => 'Google/Contacts/Entry/ExtendedProperty',
-        'Google\\Contacts\\EntryToXmlAdapter' => 'Google/Contacts/EntryToXmlAdapter',
-        'Google\\Contacts\\ListFeed' => 'Google/Contacts/ListFeed',
+        'Google\\Contacts\\ContactFeed' => 'Google/Contacts/ContactFeed',
         'Google\\Contacts\\GroupFeed' => 'Google/Contacts/GroupFeed',
         'Google\\Contacts\\Constants' => 'Google/Contacts/Constants',
     );

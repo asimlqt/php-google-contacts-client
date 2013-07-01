@@ -17,14 +17,14 @@
 namespace Google\Contacts;
 
 /**
- * Contacts Service.
+ * Contact Feed.
  *
  * @package    Google
  * @subpackage Contacts
  * @version    0.1
  * @author     Asim Liaquat <asimlqt22@gmail.com>
  */
-class ListFeed
+class ContactFeed
 {
     /**
      * 
@@ -44,7 +44,7 @@ class ListFeed
         if(isset($this->feed['feed']['entry']))
             if(count($this->feed['feed']['entry']) > 0)
                 foreach ($this->feed['feed']['entry'] as $entry)
-                    $entries[] = new Entry($entry);
+                    $entries[] = new ContactEntry($entry);
 
         return $entries;
     }

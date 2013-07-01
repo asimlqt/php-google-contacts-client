@@ -31,14 +31,14 @@ class Service
      * 
      * @return \Google\Contacts\ContactsFeed
      */
-    public function getAll()
+    public function getAllContacts()
     {
         $serviceRequest = ServiceRequestFactory::getInstance();
         $serviceRequest->getRequest()->setEndpoint("default/full");
         $serviceRequest->getRequest()->addQueryParam('max-results', 1000000);
         $serviceRequest->getRequest()->addQueryParam('alt', 'json');
         $res = $serviceRequest->execute();
-        return new ListFeed(json_decode($res, true));
+        return new ContactFeed(json_decode($res, true));
     }
 
     /**
@@ -47,7 +47,7 @@ class Service
      * @param  [type] $query [description]
      * @return [type]        [description]
      */
-    public function search($query)
+    public function searchContacts($query)
     {
         $serviceRequest = ServiceRequestFactory::getInstance();
         $serviceRequest->getRequest()->setEndpoint("default/full");
@@ -55,7 +55,7 @@ class Service
         $serviceRequest->getRequest()->addQueryParam('alt', 'json');
         $serviceRequest->getRequest()->addQueryParam('q', $query);
         $res = $serviceRequest->execute();
-        return new ListFeed(json_decode($res, true));   
+        return new ContactFeed(json_decode($res, true));   
     }
 
     /**
@@ -90,7 +90,7 @@ class Service
      * 
      * @return \Google\Contacts\ContactsFeed
      */
-    public function getGroups()
+    public function getAllGroups()
     {
         $serviceRequest = ServiceRequestFactory::getInstance();
         $serviceRequest->getRequest()->setEndpoint("default/full");

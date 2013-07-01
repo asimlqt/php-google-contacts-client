@@ -24,7 +24,7 @@ namespace Google\Contacts;
  * @version    0.1
  * @author     Asim Liaquat <asimlqt22@gmail.com>
  */
-class GroupEntry
+class GroupContactEntry
 {
     /**
      * Etag
@@ -94,8 +94,6 @@ class GroupEntry
     public function __construct($entry=null)
     {
         if(!is_null($entry)) {
-            //var_dump($entry);exit;
-            //return;
             $this->expandEntry($entry);
         }
     }
@@ -160,7 +158,7 @@ class GroupEntry
     /**
      * Get the etag
      * 
-     * @return string
+     * @return \Google\Contacts\GroupContactEntry
      */
     public function setEtag($etag)
     {
@@ -169,7 +167,7 @@ class GroupEntry
     }
 
     /**
-     * Get the group id
+     * Get the group id. This is the full url of the contact.
      * 
      * @return string
      */
@@ -181,7 +179,7 @@ class GroupEntry
     /**
      * Set the group id
      * 
-     * @return string
+     * @return \Google\Contacts\GroupContactEntry
      */
     public function setId($id)
     {
@@ -189,6 +187,13 @@ class GroupEntry
         return $this;
     }
 
+    /**
+     * Returns only the actual id part of the id url
+     * 
+     * @return string
+     *
+     * @throws \Google\Contacts\Exception if the id is not set
+     */
     public function getIdPart()
     {
         if(!is_string($this->id))
@@ -221,10 +226,13 @@ class GroupEntry
      * Set the title
      * 
      * @param string $title
+     *
+     * @return \Google\Contacts\GroupContactEntry
      */
     public function setTitle($title)
     {
         $this->title = $title;
+        return $this;
     }
 
     /**
@@ -238,9 +246,9 @@ class GroupEntry
     }
 
     /**
-     * THIS IS PROBABLY NOT REQUIRED
+     * Set links
      * 
-     * @param [type] $links [description]
+     * @param array $links
      */
     public function setLinks($links)
     {
@@ -261,7 +269,9 @@ class GroupEntry
     /**
      * Set the name components
      * 
-     * @param Entry\Name $name
+     * @param string $name
+     *
+     * @return \Google\Contacts\GroupContactEntry
      */
     public function setContent($content)
     {
@@ -269,19 +279,31 @@ class GroupEntry
         return $this;
     }
 
-    public function getExtendedProperty()
+    /**
+     * Get the extended properties
+     * 
+     * @return array \Google\Contacts\Entry\ExtendedProperty
+     */
+    public function getExtendedProperties()
     {
-        return $this->extendedProperty;
+        return $this->extendedProperties;
     }
     
-    public function setExtendedProperty($extendedProperty)
+    /**
+     * Set the extended properties
+     * 
+     * @param array $extendedProperties
+     *
+     * @return \Google\Contacts\GroupContactEntry
+     */
+    public function setExtendedProperties(array $extendedProperties)
     {
-        $this->extendedProperty = $extendedProperty;
+        $this->extendedProperties = $extendedProperties;
         return $this;
     }
 
     /**
-     * Save this contact
+     * Save this group
      *
      * If the id of this entry is not null then anpu update will be performed
      * otherwise a new contact will be created
@@ -317,12 +339,32 @@ class GroupEntry
         $request->setPost($post);
         $request->setHeaders($headers);
         $res = json_decode($serviceRequest->execute(), true);
-        //var_dump(json_decode($res, true));exit;
         $this->expandEntry($res['entry'], true);
-        //var_dump($res);
     }
 
-    public function toXml()
+    /**
+     * Delete this group
+     *
+     * @return null
+     */
+    public function delete()
+    {
+        $serviceRequest = ServiceRequestFactory::getInstance();
+        $request = $serviceRequest->getRequest(); /* @var $request \Google\Contacts\Request */
+        $request->setMethod('DELETE');
+        $request->setEndpoint("default/full/".$this->getIdPart());
+        $headers['If-Match'] = $this->etag;
+        $request->setFeedType('groups');
+        $request->setHeaders($headers);
+        $serviceRequest->execute();
+    }
+
+    /**
+     * Convert this class into an xml request which can be sent to the google api
+     * 
+     * @return string
+     */
+    private function toXml()
     {
         if(!is_array($this->extendedProperty) || count($this->extendedProperty) === 0) {
             throw new Exception('extendedProperty not set');
